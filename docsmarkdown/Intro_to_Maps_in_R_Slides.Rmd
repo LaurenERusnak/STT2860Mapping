@@ -35,7 +35,7 @@ The mapdata package extends maps with more datasets.
 
 <hr>
 
-Let's go into the **maps** package and see what data is available!
+Let's go into the **maps** package and see what data is available! First look it up in the list of installed packages. We should also review [latitude and longitude](https://www.geographyrealm.com/zero-degrees-latitude-and-zero-degrees-longitude/).
 
 
 # Some Mapping Basics
@@ -53,6 +53,8 @@ str(usa)
 
 
 ## Regions
+
+How many points does it take to outline a region (connect the dots)? The more irregular the shape, the more points needed.
 
 ```{r}
 usa %>% count(region)
@@ -72,7 +74,7 @@ ggplot(usa) +
 
 ## A Different Projection
 
-Using the [Mercator](https://desktop.arcgis.com/en/arcmap/latest/map/projections/mercator.htm) projection method.
+Using the [Mercator](https://desktop.arcgis.com/en/arcmap/latest/map/projections/mercator.htm) projection method (`coord_map()` default).
 
 ```{r, fig.height = 3, fig.width = 5, fig.align = "center"}
 ggplot(usa) +

@@ -84,8 +84,10 @@ mapdata %>%
   coord_map() +
   scale_fill_gradient(low = "white", high = "purple") +
   labs(title = "2003 Teen Birth Rates in North Carolina",
+       subtitle = "per 1,000 females in age group 15–19 years",
        caption = "Data Source: Centers for Disease Control and Prevention") +
-  theme(plot.title = element_text(hjust = 0.5)) +
+  theme(plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(hjust = 0.5)) +
   no_axes_theme
 ```
 
@@ -96,7 +98,7 @@ mapdata %>%
   distinct() %>% # since there are repeated rows for mapping
   kable(col.names = c("County", "LCL", "Birth Rate", "UCL"),
         align = c("l", "c", "c", "c"),
-        caption = "2003 Teen Birth Rates in NC") %>% 
+        caption = "2003 estimated Teen Birth Rates in NC for Age Group 15–19 years (per 1000)") %>% 
   kable_styling(full_width = FALSE,
                 position = "left",
                 bootstrap_options = c("striped", "hover", "condensed"))
