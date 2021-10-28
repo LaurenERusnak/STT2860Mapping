@@ -122,7 +122,6 @@ mapdata %>%
 
 ```
 
-
 ***
 ```{r}
 sessionInfo()
