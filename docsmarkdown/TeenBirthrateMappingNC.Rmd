@@ -1,0 +1,130 @@
+---
+title: "Teen Birthrates in NC"
+author: "YOUR NAME HERE"
+date: 'Last rendered on `r format(Sys.time(), "%A, %B %d, %Y @ %I:%M %p")`'
+output: 
+  html_document: 
+    theme: yeti
+    highlight: textmate
+    toc: true
+    toc_depth: 4
+    toc_float: false
+    code_folding: hide
+---
+
+```{r globaloptions, include = FALSE}
+knitr::opts_chunk$set(
+  message = FALSE,
+  warning = FALSE,
+  comment = NA
+)
+```
+
+***
+
+### Packages Used
+
+```{r}
+library(tidyverse)
+library(maps)
+library(knitr)
+library(kableExtra)
+```
+
+### The Datasets
+
+#### Teen Birth Rate Data from CDC
+
+```{r}
+teenNC <- readRDS("../dataprocessed/CDCteenbirthrateNC.rds") %>% 
+  mutate(subregion = tolower(county)) # to match county map data
+str(teenNC)
+```
+
+#### County Data from Maps Package
+
+```{r}
+countymapNC <- map_data("county") %>% 
+  filter(region == "north carolina") %>% 
+  select(-region) # not needed since it will be all NC data now
+str(countymapNC)
+```
+
+#### Joined Dataset for Mapping
+
+```{r}
+mapdata <- countymapNC %>% 
+  full_join(teenNC, by = "subregion")
+str(mapdata)
+```
+
+### Mapping Teen Pregnancy Rates
+
+#### Rates in 2003
+
+```{r, echo = FALSE}
+no_axes_theme <- theme(
+  axis.text = element_blank(),
+  axis.line = element_blank(),
+  axis.ticks = element_blank(),
+  panel.border = element_blank(),
+  panel.grid = element_blank(),
+  axis.title = element_blank())
+```
+
+```{r}
+mapdata %>% 
+  filter(year == 2003) %>% 
+  ggplot() +
+  geom_polygon(aes(x = long, 
+                   y = lat, 
+                   group = group, 
+                   fill = birth_rate),
+               color = "black") +
+  coord_map() +
+  scale_fill_gradient(low = "white", high = "purple") +
+  labs(title = "2003 Teen Birth Rates in North Carolina",
+       caption = "Data Source: Centers for Disease Control and Prevention") +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  no_axes_theme
+```
+
+```{r}
+mapdata %>% 
+  filter(year == 2003) %>% 
+  select(county, LCL, birth_rate, UCL) %>% 
+  distinct() %>% # since there are repeated rows for mapping
+  kable(col.names = c("County", "LCL", "Birth Rate", "UCL"),
+        align = c("l", "c", "c", "c"),
+        caption = "2003 Teen Birth Rates in NC") %>% 
+  kable_styling(full_width = FALSE,
+                position = "left",
+                bootstrap_options = c("striped", "hover", "condensed"))
+```
+
+#### Rates in 2018
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+#### Rates for Western NC in 2018
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+
+***
+```{r}
+sessionInfo()
+```
+
