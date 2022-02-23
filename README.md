@@ -1,1 +1,1 @@
-# STT2860mappingdata
+# STT2860Mapping
