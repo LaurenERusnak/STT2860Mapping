@@ -144,7 +144,7 @@ ggplot() +
 
 ## Mollweide
 
-Created by using `coord_map(projection = "mollweide")`. Preserves relative areas on the image relative to the globe.
+Created by using `coord_map(projection = "mollweide")`. Preserves areas on the image relative to the globe.
 
 ```{r echo = FALSE, fig.align = "center"}
 ggplot(usa) +
