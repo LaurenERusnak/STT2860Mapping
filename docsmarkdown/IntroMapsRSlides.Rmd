@@ -1,5 +1,5 @@
 ---
-title: "Introduction to Maps in R"
+title: "Intro to Maps in R"
 author: "Jill Thomley"
 date: '`r format(Sys.time(), "%A, %B %d, %Y @ %I:%M %p")`'
 output: ioslides_presentation
@@ -13,7 +13,25 @@ knitr::opts_chunk$set(
 )
 ```
 
-## Packages
+## What are Maps?
+
+Maps in `R` are essentially very elaborate types of scatterplots.
+
+Points are grouped so that they can be connected into shapes.
+
+We can use ggplot2 to draw maps like we can any other plot.
+
+Of course, there are some special functions to help us out!
+
+There are many more `R` packages designed for mapmaking.
+
+* maps /mapdata
+* sf / ggspatial
+* rnaturalearth
+* tidygeocoder
+* and more...
+
+## Packages We Will Start With
 
 ```{r}
 library(tidyverse)
@@ -37,7 +55,6 @@ The mapdata package extends maps with more datasets.
 
 Let's go into the **maps** package and see what data is available! First look it up in the list of installed packages. We should also review [latitude and longitude](https://www.geographyrealm.com/zero-degrees-latitude-and-zero-degrees-longitude/).
 
-
 # Some Mapping Basics
 
 ## Dataset `usa`
@@ -51,50 +68,126 @@ head(usa, 2)
 str(usa)
 ```
 
-
 ## Regions
 
-How many points does it take to outline a region (connect the dots)? The more irregular the shape, the more points needed.
+How many points does it take to outline a region (connect the dots)? The more irregular the shape, the more points needed. 
 
 ```{r}
-usa %>% count(region)
+usa %>% 
+  count(region, group) # group is a numerical ID for region
 ```
-
 
 ## Mapping `usa`
 
-Plot coordinates as paths in the x-y plane using [`geom_polygon`](https://ggplot2.tidyverse.org/reference/geom_polygon.html). Group divides the points into non-contiguous parts, like islands.
+Plot coordinates as paths in the x-y plane using [`geom_polygon`](https://ggplot2.tidyverse.org/reference/geom_polygon.html), with `x` = longitude and `y` = latitude. 
 
-```{r, fig.height = 3, fig.width = 5, fig.align = "center"}
-ggplot(usa) +
-  geom_polygon(aes(x = long, y = lat, group = group),
-               color = "black", fill = "skyblue")
+Group divides the points into non-contiguous parts, like islands. As noted before, the variable `group` is a numerical identifier for `region` in the `usa` dataset. 
+
+Points are connected in the order they occur in the dataset, as we can double-check using the `order` variable.
+
+Here I am choosing to specify the `aesthetics` in the `geometry`.
+
+```{r eval = FALSE}
+ggplot() +
+  geom_polygon(data = usa, aes(x = long, y = lat, group = group),
+               color = "black", 
+               fill = "skyblue")
 ```
 
+## Map of the USA
 
-## A Different Projection
+Does the map look odd plotted in the standard Cartesian plane?
 
-Using the [Mercator](https://desktop.arcgis.com/en/arcmap/latest/map/projections/mercator.htm) projection method (`coord_map()` default).
+```{r echo = FALSE, fig.align = "center"}
+ggplot() +
+  geom_polygon(data = usa, aes(x = long, y = lat, group = group),
+               color = "black", 
+               fill = "skyblue")
+```
 
-```{r, fig.height = 3, fig.width = 5, fig.align = "center"}
+## USA from Space
+
+```{r, echo = FALSE, fig.align = "center"}
+knitr::include_graphics("images/usafromspace.jpg", dpi = 200)
+```
+
+<p style = "text-align: center;">[NASA Has Space in All 50 States](https://www.nasa.gov/feature/jpl/nasa-has-space-in-all-50-states)</p>
+
+## Different Projections
+
+The world is a sphere, but historically most maps are made flat. Different methods exist for trying to **project** a sphere on a plane without too much information distortion.
+
+We will use the `coord_map()` function for this purpose. Two of the common options include...
+
+* [Mercator](https://desktop.arcgis.com/en/arcmap/latest/map/projections/mercator.htm) projection method, the default in `coord_map()` 
+* [Mollweide](https://desktop.arcgis.com/en/arcmap/latest/map/projections/mollweide.htm) projection method
+
+```{r eval = FALSE}
 ggplot(usa) +
   geom_polygon(aes(x = long, y = lat, group = group),
-               color = "black", fill = "skyblue") +
+               color = "black", 
+               fill = "skyblue") +
   coord_map()
 ```
 
+## Mercator
 
-## Yet Another Projection
+Has equally-spaced longitudes, wider latitudes moving away from the equator, preserves angles for navigation.
 
-Using the [Mollweide](https://desktop.arcgis.com/en/arcmap/latest/map/projections/mollweide.htm) projection method.
+```{r echo = FALSE, fig.align = "center"}
+ggplot() +
+  geom_polygon(data = usa, aes(x = long, y = lat, group = group),
+               color = "black", 
+               fill = "skyblue") +
+  coord_map()
+```
 
-```{r, fig.height = 3, fig.width = 5, fig.align = "center"}
+## Mollweide
+
+Created by using `coord_map(projection = "mollweide")`. Preserves relative areas on the image relative to the globe.
+
+```{r echo = FALSE, fig.align = "center"}
 ggplot(usa) +
   geom_polygon(aes(x = long, y = lat, group = group),
-               color = "black", fill = "skyblue") +
+               color = "black", 
+               fill = "skyblue") +
   coord_map(projection = "mollweide")
 ```
 
+## Comparing Projections
+
+```{r echo = FALSE, fig.align = "center"}
+library(gridExtra)
+
+A <- ggplot(usa) +
+  geom_polygon(aes(x = long, y = lat, group = group),
+               color = "black", 
+               fill = "skyblue") +
+  ggtitle("Rectangular Projection")
+
+B <- ggplot() +
+  geom_polygon(data = usa, aes(x = long, y = lat, group = group),
+               color = "black", 
+               fill = "skyblue") +
+  coord_map() +
+  ggtitle("Mercator Projection")
+
+C <- ggplot(usa) +
+  geom_polygon(aes(x = long, y = lat, group = group),
+               color = "black", 
+               fill = "skyblue") +
+  coord_map(projection = "mollweide") +
+  ggtitle("Mollweide Projection")
+
+D <- ggplot(usa) +
+  geom_polygon(aes(x = long, y = lat, group = group),
+               color = "black", 
+               fill = "skyblue") +
+  coord_map(projection = "cylindrical") +
+  ggtitle("Cylindrical Projection")
+
+grid.arrange(A, B, C, D, nrow = 2)
+```
 
 ## Dataset `state`
 
@@ -103,16 +196,14 @@ state <- map_data("state")
 head(state, 12)
 ```
 
-
 ## Mapping `state`
 
 ```{r, fig.height = 3.5, fig.align = "center"}
-ggplot(state) +
-  geom_polygon(aes(x = long, y = lat, group = group),
+ggplot() +
+  geom_polygon(data = state, aes(x = long, y = lat, group = group),
                color = "black", fill = "lightgreen") +
   coord_map()
 ```
-
 
 ## Dataset `county`
 
@@ -121,16 +212,14 @@ county <- map_data("county")
 head(county, 10)
 ```
 
-
 ## Mapping `county`
 
 ```{r, fig.height = 3.5, fig.align = "center"}
-ggplot(county) +
-  geom_polygon(aes(x = long, y = lat, group = group),
+ggplot() +
+  geom_polygon(data = county, aes(x = long, y = lat, group = group),
                color = "black", fill = "lightgreen") +
   coord_map()
 ```
-
 
 ## Filtering `state` for NC
 
@@ -142,7 +231,6 @@ filter(state, region == "north carolina") %>%
   coord_map()
 ```
 
-
 ## Filtering `county` for NC
 
 ```{r, fig.height = 3, fig.align = "center"}
@@ -153,7 +241,6 @@ filter(county, region == "north carolina") %>%
   coord_map()
 ```
 
-
 ## Filtering `world` for USA
 
 ```{r}
@@ -161,7 +248,6 @@ world <- map_data("world")
 str(world)
 world_usa <- filter(map_data("world"), region == "USA")
 ```
-
 
 ## Mapping `world_usa`
 
@@ -175,7 +261,6 @@ ggplot(world_usa) +
   scale_x_continuous(breaks = seq(-160, 180, by = 20))
 ```
 
-
 ## Adjusting Our X-Axis
 
 Change orientation from default to center at longitude 180.
@@ -187,7 +272,6 @@ ggplot(world_usa) +
   coord_map(orientation = c(90, 180, 0)) +
   scale_x_continuous(breaks = seq(-160, 180, by = 20))
 ```
-
 
 ## A Different Adjustment 
 
@@ -201,7 +285,6 @@ world_usa %>%
   scale_x_continuous(breaks = seq(-200, 0, by = 20))
 ```
 
-
 ## The `mollweide` Projection
 
 ```{r, fig.height = 3, fig.align = "center"}
@@ -213,7 +296,6 @@ worldmap <- world_usa %>%
 worldmap + coord_map(projection = "mollweide")
 ```
 
-
 ## The `ortho` Projection
 
 We can store the basic map as an object and then add different customizations without repeating the basic mapping code. This is true for any ggplot2 plot.
@@ -221,7 +303,6 @@ We can store the basic map as an object and then add different customizations wi
 ```{r, fig.height = 3, fig.align = "center"}
 worldmap + coord_map(projection = "ortho")
 ```
-
 
 ## Regions in `world_usa`
 
@@ -239,7 +320,6 @@ The count `n` is the number of coordinates for the subregion.
 tail(world_usa %>% count(region, subregion), 10)
 ```
 
-
 ## Mapping Hawaii
 
 In this dataset we filter for a US state using `subregion`.
@@ -251,7 +331,6 @@ filter(world_usa, subregion == "Hawaii") %>%
                color = "black", fill = "turquoise") +
   coord_map()
 ```
-
 
 # Removing the Axes
 
@@ -275,18 +354,21 @@ ditch_the_axes <- theme(
 )
 ```
 
+##
 
-## Voila, a plot with no axes!
-
-```{r, fig.height = 3, fig.align = "center"}
+```{r}
 ncmap <- filter(county, region == "north carolina") %>% 
   ggplot() +
   geom_polygon(aes(x = long, y = lat, group = group),
-               color = "black", fill = "lightgoldenrod") +
-  coord_map()
-ncmap + ditch_the_axes
+               color = "black", 
+               fill = "lightgoldenrod")
 ```
 
+```{r, fig.height = 2.5, fig.align = "center"}
+ncmap + 
+  coord_map() +
+  ditch_the_axes
+```
 
 ## A More Elaborate Version
 
@@ -308,43 +390,29 @@ no_axes_alt <- theme(
   )
 ```
 
-
 ## Another plot with no axes!
 
 Again we use our stored map object and add customization.
 
 ```{r, fig.height = 3, fig.align = "center"}
-ncmap + no_axes_alt
+ncmap + 
+  coord_map(projection = "mollweide") +
+  no_axes_alt
 ```
-
 
 # Plotting Data on a Map
 
 ## Boone on the NC Map
 
-```{r, fig.height = 2.5}
+```{r, fig.height = 2.7}
 ncmap +
-  geom_point(aes(x = -81.6746, y = 36.2168), 
-             size = 1.25, shape = 8, color = "red") +
+  geom_point(aes(x = -81.7, y = 36.2), size = 1.25, color = "red") +
+  coord_map() +
   labs(title = "Location of Boone, North Carolina",
-       caption = "36.22° N, 81.67° W") +
+       caption = "36.2° N, 81.7° W") +
   theme(plot.title = element_text(hjust = 0.5)) +
   ditch_the_axes
 ```
-
-
-## Boone on the NC Map
-
-```{r, fig.height = 2.5}
-ncmap +
-  geom_point(aes(x = -81.6746, y = 36.2168), 
-             size = 1.25, shape = 8, color = "red") +
-  labs(title = "Location of Boone, North Carolina",
-       caption = "36.22° N, 81.67° W") +
-  theme(plot.title = element_text(hjust = 0.5)) +
-  ditch_the_axes
-```
-
 
 ## Places Dr. Thomley Has Lived
 
@@ -353,8 +421,8 @@ places = tibble(lats = c(41.6528, 42.3736, 42.6526, 36.2168),
                 longs = c(-83.5379, -71.1097, -73.7562, -81.6746),
                 names = c("Toledo", "Cambridge", "Albany", "Boone"))
 
-ggplot(state) +
-  geom_polygon(aes(x = long, y = lat, group = group),
+ggplot() +
+  geom_polygon(data = state, aes(x = long, y = lat, group = group),
                color = "white", fill = "thistle") +
   geom_point(data = places, aes(x = longs, y = lats),
              size = 2, shape = 8, color = "purple") +
@@ -373,12 +441,11 @@ ggplot(state) +
 
 ```
 
+## References
 
-# Resources
-
-##
-
-* http://eriqande.github.io/rep-res-web/lectures/making-maps-with-R.html
-* https://github.com/UrbanInstitute/urbnmapr
-* https://socviz.co/maps.html
-
+* [Making Maps with R](http://eriqande.github.io/rep-res-web/lectures/making-maps-with-R.html)
+* [Urban Mapper](https://github.com/UrbanInstitute/urbnmapr)
+* [Draw Maps](https://socviz.co/maps.html)
+* [DataCamp: Interactive Maps with leaflet in R](https://app.datacamp.com/learn/courses/interactive-maps-with-leaflet-in-r)
+* [DataCamp: Visualizing Geospatial Data in R](https://app.datacamp.com/learn/courses/visualizing-geospatial-data-in-r)
+* [DC Skill Track: Spatial Data with R](https://app.datacamp.com/learn/skill-tracks/spatial-data-with-r)
