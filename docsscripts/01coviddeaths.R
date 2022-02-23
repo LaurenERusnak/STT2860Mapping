@@ -8,9 +8,9 @@ library(readxl)
 
 # source https://data.cdc.gov/NCHS/Provisional-COVID-19-Deaths-by-Sex-and-Age/9bhg-hcku
 
-date <- 20211027
+date <- "2021_10_27"
 
-dataset <- paste0("dataraw/CDCcovid19deaths", date, ".xlsx")
+dataset <- paste0("dataraw/CDCcovid19deaths_", date, ".xlsx")
 
 saveRDS(read_excel(dataset,
   sheet = 1,
@@ -34,5 +34,5 @@ saveRDS(read_excel(dataset,
     "footnote"
   )
 ),
-file = paste0("dataprocessed/CDCcovid19deaths", date, ".rds")
+file = paste0("dataprocessed/CDCcovid19deaths_", date, ".rds")
 )
