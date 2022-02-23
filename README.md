@@ -4,5 +4,5 @@ This repository provides course content, a sample project structure, and practic
 
 Some of the concepts included:
 
-* creating maps in R using the ggplot2, maps, and mapdata packages
-* using scripts to create/process raw data files and write to .rds files
+* creating maps in `R` using the ggplot2, maps, and mapdata packages
+* using scripts to create/process raw data files and write to `.rds` files
