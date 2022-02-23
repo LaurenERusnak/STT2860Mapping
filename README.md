@@ -6,3 +6,4 @@ Some of the concepts included:
 
 * creating maps in `R` using the ggplot2, maps, and mapdata packages
 * using scripts to create/process raw data files and write to `.rds` files
+* more tba...
