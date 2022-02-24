@@ -68,6 +68,23 @@ head(usa, 2)
 str(usa)
 ```
 
+## First as a Scatterplot
+
+```{r}
+ggplot(usa, aes(x = long, y = lat)) + geom_point(size = 0.25)
+```
+
+## Zooming In...
+
+So how can we connect all the dots to get the outline of the US?
+
+```{r echo = FALSE}
+ggplot(usa, aes(x = long, y = lat)) +
+  geom_point(size = 0.25) +
+  scale_x_continuous(limits = c(-75, -67)) +
+  scale_y_continuous(limits = c(40, 48))
+```
+
 ## Regions
 
 How many points does it take to outline a region (connect the dots)? The more irregular the shape, the more points needed. 
@@ -336,7 +353,7 @@ filter(world_usa, subregion == "Hawaii") %>%
 
 ## Ditch the Axes!
 
-We usually do not need the latitude and longitude axes on our maps, so we can use theme elements to get rid of them.
+We usually do not need the latitude and longitude axes on our maps, so we can use [theme elements](https://ggplot2.tidyverse.org/reference/theme.html) to get rid of them.
 
 ```{r}
 # Theme Credit: http://eriqande.github.io/rep-res-web/lectures/
@@ -440,6 +457,40 @@ ggplot() +
 ```{r, ref.label = I("livemap"), echo = FALSE, eval = TRUE}
 
 ```
+
+Can we also fill those four states with a color to identify them?
+
+##
+
+```{r, livemap2, eval = FALSE}
+state_mod <- state %>% 
+  mutate(thom = if_else(region %in% c("ohio", "massachusetts", "new york", 
+                                      "north carolina"), "yes", "no"))
+
+ggplot() +
+  geom_polygon(data = state_mod, 
+               aes(x = long, y = lat, group = group, fill = thom),
+               color = "white") +
+  geom_point(data = places, aes(x = longs, y = lats),
+             size = 2, shape = 8, color = "black") +
+  geom_label(data = places, aes(x = longs, y = lats, label = names), 
+             hjust = c("right", "right", "left", "right"),
+             nudge_x = c(-1, -0.5, 0.5, -1),             
+             vjust = c("middle", "top", "bottom", "middle"),
+             nudge_y = c(0, -0.5, 0.5, 0)) +
+  scale_fill_manual(values = c("thistle", "violet")) +
+  coord_map() +
+  theme(legend.position = "none") +
+  ditch_the_axes
+```
+
+## The New Map
+
+```{r, ref.label = I("livemap2"), echo = FALSE, eval = TRUE}
+
+```
+
+Filling a map requires a variable corresponding to the regions. 
 
 ## References
 
