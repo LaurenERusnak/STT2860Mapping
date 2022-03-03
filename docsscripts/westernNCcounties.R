@@ -1,4 +1,4 @@
-# create a dataset of western NC county names and write to Rdata format
+# create a dataset of western NC county names and write to .rds format
 # created: 2021-10-27
 # updated: 2022-02-23
 # reformatted code style

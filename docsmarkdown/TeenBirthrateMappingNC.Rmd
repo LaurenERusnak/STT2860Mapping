@@ -36,7 +36,7 @@ library(kableExtra)
 #### Teen Birth Rate Data from CDC
 
 ```{r}
-teenNC <- readRDS("../dataprocessed/CDCteenbirthrateNC.rds") %>% 
+teenNC <- readRDS("../dataprocessed/CDCteenbirthrateNC.rds") %>%
   mutate(subregion = tolower(county)) # to match county map data
 str(teenNC)
 ```
@@ -44,8 +44,8 @@ str(teenNC)
 #### County Data from Maps Package
 
 ```{r}
-countymapNC <- map_data("county") %>% 
-  filter(region == "north carolina") %>% 
+countymapNC <- map_data("county") %>%
+  filter(region == "north carolina") %>%
   select(-region) # not needed since it will be all NC data now
 str(countymapNC)
 ```
@@ -53,7 +53,7 @@ str(countymapNC)
 #### Joined Dataset for Mapping
 
 ```{r}
-mapdata <- countymapNC %>% 
+mapdata <- countymapNC %>%
   full_join(teenNC, by = "subregion")
 str(mapdata)
 ```
@@ -69,39 +69,51 @@ no_axes_theme <- theme(
   axis.ticks = element_blank(),
   panel.border = element_blank(),
   panel.grid = element_blank(),
-  axis.title = element_blank())
+  axis.title = element_blank()
+)
 ```
 
 ```{r}
-mapdata %>% 
-  filter(year == 2003) %>% 
+mapdata %>%
+  filter(year == 2003) %>%
   ggplot() +
-  geom_polygon(aes(x = long, 
-                   y = lat, 
-                   group = group, 
-                   fill = birth_rate),
-               color = "black") +
+  geom_polygon(aes(
+    x = long,
+    y = lat,
+    group = group,
+    fill = birth_rate
+  ),
+  color = "black"
+  ) +
   coord_map() +
   scale_fill_gradient(low = "white", high = "purple") +
-  labs(title = "2003 Teen Birth Rates in North Carolina",
-       subtitle = "per 1,000 females in age group 15–19 years",
-       caption = "Data Source: Centers for Disease Control and Prevention") +
-  theme(plot.title = element_text(hjust = 0.5),
-        plot.subtitle = element_text(hjust = 0.5)) +
+  labs(
+    title = "2003 Teen Birth Rates in North Carolina",
+    subtitle = "per 1,000 females in age group 15–19 years",
+    caption = "Data Source: Centers for Disease Control and Prevention"
+  ) +
+  theme(
+    plot.title = element_text(hjust = 0.5),
+    plot.subtitle = element_text(hjust = 0.5)
+  ) +
   no_axes_theme
 ```
 
 ```{r}
-mapdata %>% 
-  filter(year == 2003) %>% 
-  select(county, LCL, birth_rate, UCL) %>% 
+mapdata %>%
+  filter(year == 2003) %>%
+  select(county, LCL, birth_rate, UCL) %>%
   distinct() %>% # since there are repeated rows for mapping
-  kable(col.names = c("County", "LCL", "Birth Rate", "UCL"),
-        align = c("l", "c", "c", "c"),
-        caption = "2003 estimated Teen Birth Rates in NC for Age Group 15–19 years (per 1000)") %>% 
-  kable_styling(full_width = FALSE,
-                position = "left",
-                bootstrap_options = c("striped", "hover", "condensed"))
+  kable(
+    col.names = c("County", "LCL", "Birth Rate", "UCL"),
+    align = c("l", "c", "c", "c"),
+    caption = "2003 estimated Teen Birth Rates in NC for Age Group 15–19 years (per 1000)"
+  ) %>%
+  kable_styling(
+    full_width = FALSE,
+    position = "left",
+    bootstrap_options = c("striped", "hover", "condensed")
+  )
 ```
 
 #### Rates in 2018
