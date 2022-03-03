@@ -1,4 +1,4 @@
-# read in CDC teen births data and write to Rdata format
+# read in CDC teen births data and write to .rds format
 # created: 2021-10-27
 # updated: 20221-02-23
 # reformatted code style and renamed

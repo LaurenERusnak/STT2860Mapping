@@ -1,4 +1,4 @@
-# read in CDC provisional COVID-19 deaths data and write to Rdata format
+# read in CDC provisional COVID-19 deaths data and write to .rds format
 # created: 2021-10-27
 # updated: 2022-02-23
 # reformatted code style and added paste0 functionality

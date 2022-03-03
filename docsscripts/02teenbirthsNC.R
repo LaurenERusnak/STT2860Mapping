@@ -1,4 +1,4 @@
-# modify teen births data and write to Rdata format
+# modify teen births data and write to .rds format
 # filter for data from the state of North Carolina
 # created: 2021-10-27
 # updated: 2022-02-23

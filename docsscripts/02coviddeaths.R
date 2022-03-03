@@ -1,4 +1,4 @@
-# modify COVID-19 deaths data and write to Rdata format
+# modify COVID-19 deaths data and write to .rds format
 # filter for "All Ages" in all included State entities
 # select COVID-19 Deaths and Total Deaths as outcomes
 # created: 2021-10-27
