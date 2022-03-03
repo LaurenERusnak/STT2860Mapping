@@ -25,7 +25,7 @@ Of course, there are some special functions to help us out!
 
 There are many more `R` packages designed for mapmaking.
 
-* maps /mapdata
+* maps / mapdata
 * sf / ggspatial
 * rnaturalearth
 * tidygeocoder
